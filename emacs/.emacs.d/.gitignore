@@ -1,0 +1,11 @@
+elpa
+.eln-cache
+.cask
+auto-save-list
+recentf
+snippets
+transient
+projectile*
+straight/
+eshell/
+.lsp-session*
