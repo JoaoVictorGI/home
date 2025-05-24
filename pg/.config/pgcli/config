@@ -232,7 +232,7 @@ output.null = "#808080"
 # Here's where you can provide a list of connection string aliases.
 # You can use it by passing the -D option. `pgcli -D example_dsn`
 [alias_dsn]
-db = postgresql://joao:12345@localhost:5432/db
+db = postgresql://joao@localhost:5432/db
 # example_dsn = postgresql://[user[:password]@][netloc][:port][/dbname]
 
 # Format for number representation
