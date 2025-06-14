@@ -1,6 +1,6 @@
 PATH=$HOME/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/X11R6/bin:/usr/local/bin:/usr/local/sbin:/usr/games
 export PATH HOME TERM
-export PATH="$HOME/.local/bin:$HOME/.local/go/bin:$HOME/.cargo/bin:$HOME/.npm-global/bin:$HOME/.config/emacs/bin:$HOME/.cache/.bun/bin:$HOME/.config/composer/vendor/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.local/go/bin:$HOME/.cargo/bin:$HOME/.npm-global/bin:$HOME/.config/emacs/bin:$HOME/.cache/.bun/bin:$HOME/.config/composer/vendor/bin:$HOME/.local/*/bin:$PATH"
 
 export NPM_CONFIG_PREFIX=~/.npm-global
 
@@ -31,6 +31,8 @@ export GOSUMDB=off
 export GOTOOLCHAIN=local
 export XZ_OPT="-T0"
 
+export GPG_TTY=$(tty)
+
 
 mkdir -pm 0700 "$XDG_RUNTIME_DIR"
 
@@ -44,21 +46,8 @@ if [ -d "$HOME/.local/bin" ]; then
 	PATH="$HOME/.local/bin:$PATH"
 fi
 
-ssh_pid=$(pidof ssh-agent)
-
-# If the agent is not running, start it, and save the environment to a file
-if [ "$ssh_pid" = "" ]; then
-	ssh_env="$(ssh-agent -s)"
-	echo "$ssh_env" | head -n 2 | tee ~/.ssh_agent_env >/dev/null
-fi
-
-# Load the environment from the file
-if [ -f ~/.ssh_agent_env ]; then
-	eval "$(cat ~/.ssh_agent_env)"
-fi
-
-test -r '/home/joao/.opam/opam-init/init.sh' && . '/home/joao/.opam/opam-init/init.sh' >/dev/null 2>/dev/null || true
-eval $(opam env)
-
 [ -f "/home/joao/.ghcup/env" ] && . "/home/joao/.ghcup/env" # ghcup-env
 
+eval $(keychain --eval --quiet ~/.ssh/id_ed25519)
+
+. "$HOME/.local/share/../bin/env"

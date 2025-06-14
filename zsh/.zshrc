@@ -17,7 +17,7 @@ export DISPLAY=:0.0
 export LIBGL_ALWAYS_INDIRECT=1
 export GDK_SCALE=1
 export GDK_DPI_SCALE=1
-export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin:/opt/gerbil/bin"
 
 export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
   --color=fg:#e4e4ef,fg+:#f4f4ff,bg:#181818,bg+:#282828
@@ -44,4 +44,5 @@ eval "$(/usr/bin/mise activate zsh)"
 
 autoload -U compinit
 compinit
-# source <(COMPLETE=zsh jj)
+
+. "$HOME/.local/share/../bin/env"
