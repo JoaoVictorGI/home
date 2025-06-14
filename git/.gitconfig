@@ -1,0 +1,27 @@
+[user]
+	email = joaovictor.gizidoro@gmail.com
+	name = João Victor
+	signingkey = 754BA2A79621677E
+[http]
+	postBuffer = 524288000
+[core]
+	editor = emacs
+	compression = 9
+	whitespace = error
+	preloadindex = true
+[alias]
+	st = status -s
+	sta = status
+	conf = config --global --edit
+	ci = commit
+	co = checkout
+	cod = checkout .
+	rh = reset HEAD
+	aa = add -A
+	cdf = clean -df
+	pr = pull --rebase
+	br = branch
+	bra = branch -a
+	amend = commit -a --amend --no-exit
+[commit]
+	gpgSign = true
