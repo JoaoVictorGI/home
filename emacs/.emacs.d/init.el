@@ -11,6 +11,12 @@
 
 (setq warning-minimum-level :error)
 
+(custom-set-variables
+ '(auto-save-file-name-transforms '(("." "~/.emacs.d/autosaves/\1" t)))
+ '(backup-directory-alist '(("." . "~/.emacs.d/backups"))))
+(make-directory "~/.emacs.d/autosaves" t)
+(make-directory "~/.emacs.d/backups" t)
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name
@@ -68,7 +74,7 @@
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
   :hook ((prog-mode . (lambda ()
-			(unless (derived-mode-p '(emacs-lisp-mode racket-mode gerbil-mode))
+			(unless (derived-mode-p '(emacs-lisp-mode racket-mode gerbil-mode scheme-mode))
 			  (lsp-deferred))))
 	 ;;(prog-mode . lsp-deferred)
 	 (lsp-mode . lsp-lens-mode)
@@ -200,6 +206,9 @@
   ("M-x" . helm-M-x)
   ("M-i" . helm-imenu)
   ("C-x b" . helm-buffers-list))
+(use-package helm-lsp
+  :straight t)
+(define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)
 
 
 (use-package projectile
@@ -261,68 +270,78 @@
 (use-package geiser-mit
   :straight t)
 
-(use-package geiser-racket
+;;(use-package geiser-racket
+;;  :straight t
+;;  :after geiser-mit)
+
+;;(use-package racket-mode
+;;  :straight t
+;;  :after geiser-racket
+;;  :hook ((racket-mode . lsp-deferred)))
+
+
+;; (use-package gerbil-mode
+;;   :straight (:host github
+;; 		   :repo "mighty-gerbils/gerbil"
+;; 		   :files ("etc/gerbil-mode.el")
+;; 		   :branch "master")
+;;   :when (file-directory-p *gerbil-path*)
+;;   :preface
+;;   (defvar *gerbil-path*
+;;     (shell-command-to-string "gxi -e '(display (path-expand \"~~\"))'\
+;;       -e '(flush-output-port)'"))
+;;   (defun gerbil-setup-buffers ()
+;;     "Change current buffer mode to gerbil-mode and start a REPL"
+;;     (interactive)
+;;     (gerbil-mode)
+;;     (split-window-right)
+;;     (shrink-window-horizontally 2)
+;;     (let ((buf (buffer-name)))
+;;       (other-window 1)
+;;       (run-scheme "gxi")
+;;       (switch-to-buffer-other-window "*scheme*" nil)
+;;       (switch-to-buffer buf)))
+;;   (defun clear-comint-buffer ()
+;;     (interactive)
+;;     (with-current-buffer "*scheme*"
+;;       (let ((comint-buffer-maximum-size 0))
+;;         (comint-truncate-buffer))))
+;;   :mode (("\\.ss\\'"  . gerbil-mode)
+;;          ("\\.pkg\\'" . gerbil-mode))
+;;   :bind (:map comint-mode-map
+;; 	      (("C-S-n" . comint-next-input)
+;; 	       ("C-S-p" . comint-previous-input)
+;; 	       ("C-S-l" . clear-comint-buffer))
+;; 	      :map gerbil-mode-map
+;; 	      (("C-S-l" . clear-comint-buffer)))
+;;   :init
+;;   (autoload 'gerbil-mode
+;;     (expand-file-name "share/emacs/site-lisp/gerbil-mode.el" *gerbil-path*)
+;;     "Gerbil editing mode." t)
+;;   (global-set-key (kbd "C-c C-g") 'gerbil-setup-buffers)
+;;   :hook
+;;   (inferior-scheme-mode . gambit-inferior-mode)
+;;   :after (scheme-mode)
+;;   :config
+;;   ;;  (when (fboundp 'derived-mode-add-parents)
+;;   ;;    (derived-mode-add-parents 'gerbil-mode '(prog-mode)))
+;;   (require 'gambit
+;;            (expand-file-name "share/emacs/site-lisp/gambit.el" *gerbil-path*))
+;;   (setf scheme-program-name (expand-file-name "bin/gxi" *gerbil-path*))
+;;   (let ((tags (locate-dominating-file default-directory "TAGS")))
+;;     (when tags (visit-tags-table tags)))
+;;   (let ((tags (expand-file-name "src/TAGS" *gerbil-path*)))
+;;     (when (file-exists-p tags) (visit-tags-table tags))))
+
+
+(use-package geiser-guile
   :straight t
   :after geiser-mit)
+(setq geiser-guile-binary "guile")
+(setq geiser-scheme-implementation 'guile)
+(setq geiser-active-implementations '(guile))
 
-(use-package racket-mode
-  :straight t
-  :after geiser-racket
-  :hook ((racket-mode . lsp-deferred)))
-
-
-(use-package gerbil-mode
-  :straight (:host github
-		   :repo "mighty-gerbils/gerbil"
-		   :files ("etc/gerbil-mode.el")
-		   :branch "master")
-  :when (file-directory-p *gerbil-path*)
-  :preface
-  (defvar *gerbil-path*
-    (shell-command-to-string "gxi -e '(display (path-expand \"~~\"))'\
-      -e '(flush-output-port)'"))
-  (defun gerbil-setup-buffers ()
-    "Change current buffer mode to gerbil-mode and start a REPL"
-    (interactive)
-    (gerbil-mode)
-    (split-window-right)
-    (shrink-window-horizontally 2)
-    (let ((buf (buffer-name)))
-      (other-window 1)
-      (run-scheme "gxi")
-      (switch-to-buffer-other-window "*scheme*" nil)
-      (switch-to-buffer buf)))
-  (defun clear-comint-buffer ()
-    (interactive)
-    (with-current-buffer "*scheme*"
-      (let ((comint-buffer-maximum-size 0))
-        (comint-truncate-buffer))))
-  :mode (("\\.ss\\'"  . gerbil-mode)
-         ("\\.pkg\\'" . gerbil-mode))
-  :bind (:map comint-mode-map
-	      (("C-S-n" . comint-next-input)
-	       ("C-S-p" . comint-previous-input)
-	       ("C-S-l" . clear-comint-buffer))
-	      :map gerbil-mode-map
-	      (("C-S-l" . clear-comint-buffer)))
-  :init
-  (autoload 'gerbil-mode
-    (expand-file-name "share/emacs/site-lisp/gerbil-mode.el" *gerbil-path*)
-    "Gerbil editing mode." t)
-  (global-set-key (kbd "C-c C-g") 'gerbil-setup-buffers)
-  :hook
-  (inferior-scheme-mode . gambit-inferior-mode)
-  :after (scheme-mode)
-  :config
-  ;;  (when (fboundp 'derived-mode-add-parents)
-  ;;    (derived-mode-add-parents 'gerbil-mode '(prog-mode)))
-  (require 'gambit
-           (expand-file-name "share/emacs/site-lisp/gambit.el" *gerbil-path*))
-  (setf scheme-program-name (expand-file-name "bin/gxi" *gerbil-path*))
-  (let ((tags (locate-dominating-file default-directory "TAGS")))
-    (when tags (visit-tags-table tags)))
-  (let ((tags (expand-file-name "src/TAGS" *gerbil-path*)))
-    (when (file-exists-p tags) (visit-tags-table tags))))
+(setq scheme-program-name "guile")
 
 
 (use-package cider
@@ -339,9 +358,10 @@
   :hook
   (lisp-mode . rainbow-delimiters-mode)
   (clojure-mode . rainbow-delimiters-mode)
-  (racket-mode . rainbow-delimiters-mode)
+  ;;(racket-mode . rainbow-delimiters-mode)
   (emacs-lisp-mode . rainbow-delimiters-mode)
-  (gerbil-mode . rainbow-delimiters-mode))
+;;  (gerbil-mode . rainbow-delimiters-mode)
+  (scheme-mode . rainbow-delimiters-mode))
 
 (use-package smartparens
   :straight t
@@ -349,8 +369,9 @@
 	 (emacs-lisp-mode . smartparens-mode)
 	 (clojure-mode . smartparens-mode)
 	 (cider-mode . smartparens-mode)
-	 (racket-mode . smartparens-mode)
-	 (gerbil-mode . smartparens-mode))
+;;	 (racket-mode . smartparens-mode)
+;;	 (gerbil-mode . smartparens-mode)
+	 (scheme-mode . smartparens-mode))
   :bind (:map smartparens-mode-map
 	      ("C-M-<right>" . 'sp-forward-sexp)
 	      ("C-M-<left>" . 'sp-backward-sexp)
@@ -362,6 +383,12 @@
 	      ("C-S-s" . 'sp-backward-slurp-sexp)
 	      ("C-M-b" . 'sp-forward-barf-sexp)
 	      ("C-S-b" . 'sp-backward-barf-sexp)))
+
+
+(use-package lsp-java
+  :straight t
+  :after lsp-mode
+  :hook (java-mode . lsp-deferred))
 
 
 (use-package protobuf-mode
@@ -381,8 +408,8 @@
   :hook (emacs-lisp-mode . eros-mode))
 
 
-(use-package peg
-  :straight t)
+;;(use-package peg
+;;  :straight t)
 
 (use-package pgmacs
   :straight (:host github :repo "MMagueta/pgmacs" :branch "add-script-support" :files ("dist" "*.el"))
