@@ -8,13 +8,14 @@ return {
       })
     end,]]
     --"igrmk/kull-vim"
-    "jnurmine/Zenburn",
+    -- "jnurmine/Zenburn",
+    "oonamo/ef-themes.nvim",
   },
 
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "zenburn",
+      colorscheme = "ef-dream",
     },
   },
 }
